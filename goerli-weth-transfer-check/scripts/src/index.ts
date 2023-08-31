@@ -19,7 +19,7 @@ dotenv.config();
  */
 
 const GOERLI_WETH_ADDR = "0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6";
-const CALLBACK_CONTRACT_ADDR = "0xe6fB74837117C38093dfcdFfee527a6Af151DEc8";
+const CALLBACK_CONTRACT_ADDR = "0x2C5144E60Fec716D63D64c16999d3430Dfd33e3A";
 
 const config: AxiomConfig = {
   providerUri: process.env.PROVIDER_URI_GOERLI as string,
@@ -31,12 +31,11 @@ const axiom = new Axiom(config);
 const axiomQuery = axiom.query as QueryV2;
 
 async function main() {
-  // Get txHash of Goerli WETH `Transfer` event
-  //   Transfer(index_topic_1 address src, index_topic_2 address dst, uint256 wad)
-  //   0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef
+  // Transfer(index_topic_1 address src, index_topic_2 address dst, uint256 wad) has
+  // eventSchema: 0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef
 
   // txHash of Goerli WETH `Transfer` event containing my `src` address
-  const txHash = "0x08db15d6a06c9c60f0223b85f9d3ff9db00d35a861ff219de301ffc17c10cade";
+  const txHash = "0x01396161a628053123ba63978279cfc28304b2c7ff2efda835efcc78072dd121";
   const eventSchema = "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef";
 
   // Build the dataQuery request
@@ -44,7 +43,7 @@ async function main() {
     receiptSubqueries: [
       {
         txHash,
-        fieldOrLogIdx: receiptUseLogIdx(1), // log index of `Transfer` event within that tx
+        fieldOrLogIdx: receiptUseLogIdx(2), // log index of `Transfer` event within that tx
         topicOrDataIdx: 1,
         eventSchema: eventSchema,
       }
@@ -54,7 +53,7 @@ async function main() {
   // Build the on-chain callback params
   const callback = {
     callbackAddr: CALLBACK_CONTRACT_ADDR,
-    callbackFunctionSelector: getFunctionSelector("validate", ["address"]),
+    callbackFunctionSelector: getFunctionSelector("validate", ["bytes32","address[]","bytes"]),
     resultLen: 1,
     callbackExtraData: eventSchema,
   };
@@ -67,12 +66,16 @@ async function main() {
   );
   await query.build();
 
-  // Calculate the fee to submit the Query
+  // Log the dataQueryHash
+  const builtQuery = query.getBuiltQuery();
+  console.log("dataQueryHash", builtQuery?.dataQueryHash);
+
+  // Calculate the fee required to submit the Query
   const payment = await query.calculateFee();
 
   // Send the Query on-chain
   await query.sendOnchainQuery(payment, (receipt) => {
-    console.log("receipt", receipt);
+    console.log("txReceipt", receipt);
   });
 }
 
