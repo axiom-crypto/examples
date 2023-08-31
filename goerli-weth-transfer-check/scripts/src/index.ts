@@ -45,9 +45,9 @@ async function main() {
     receiptSubqueries: [
       {
         txHash,
-        fieldOrLogIdx: receiptUseLogIdx(2), // log index of `Transfer` event within that tx
+        fieldOrLogIdx: receiptUseLogIdx(2), // log index of `Transfer` event within that tx; NOT in the block
         topicOrDataIdx: 1,
-        eventSchema: eventSchema,
+        eventSchema: eventSchema, // // keccak256("Transfer(address,address,uint256)")
       },
     ],
   };
@@ -56,11 +56,11 @@ async function main() {
   const callback = {
     callbackAddr: CALLBACK_CONTRACT_ADDR,
     callbackFunctionSelector: getFunctionSelector("validate", [
-      "bytes32",
-      "address[]",
+      "bytes32", // querySchema field
+      "address[]", // results
     ]),
     resultLen: 1,
-    callbackExtraData: eventSchema,
+    callbackExtraData: eventSchema, // optional extra calldata to pass to function
   };
 
   // Create a new Query with our dataQuery and on-chain callback and build it
