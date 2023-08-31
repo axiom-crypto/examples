@@ -10,12 +10,12 @@ contract AddressCheckerTest is Test {
     AddressChecker public checker;
 
     function setUp() public {
-        vm.startPrank(OWNER);
         checker = new AddressChecker();
-        vm.stopPrank();
     }
 
     function validate() public {
-        checker.validate(OWNER);
+        address[] memory addr = new address[](1);
+        addr[0] = OWNER;
+        checker.validate(bytes32(0), addr);
     }
 }
