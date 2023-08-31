@@ -1,7 +1,7 @@
 {
-  "name": "goerli-weth-transfer-check-scripts",
+  "name": "historic-token-balance-erc20-erc721-scripts",
   "version": "1.0.0",
-  "description": "Script files AxiomV2 example where the user submits a proof of a WETH transfer on Goerli.",
+  "description": "Script files for getting the historic token balance of ERC20 and ERC721 tokens",
   "main": "index.js",
   "scripts": {
     "start": "ts-node src/index.ts"
