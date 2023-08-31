@@ -71,10 +71,6 @@ async function main() {
   );
   await query.build();
 
-  // Log the dataQueryHash
-  const builtQuery = query.getBuiltQuery();
-  console.log("dataQueryHash", builtQuery?.dataQueryHash);
-
   // Calculate the fee required to submit the Query
   const payment = await query.calculateFee();
 

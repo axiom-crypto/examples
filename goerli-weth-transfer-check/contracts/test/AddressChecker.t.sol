@@ -8,7 +8,6 @@ contract AddressCheckerTest is Test {
     address public constant OWNER = 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266;
 
     AddressChecker public checker;
-    address[] public addrs;
 
     function setUp() public {
         checker = new AddressChecker();
