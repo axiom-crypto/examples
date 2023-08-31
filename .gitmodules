@@ -1,0 +1,3 @@
+[submodule "goerli-weth-transfer-check/contracts/lib/openzeppelin-contracts"]
+	path = goerli-weth-transfer-check/contracts/lib/openzeppelin-contracts
+	url = https://github.com/openZeppelin/openzeppelin-contracts
