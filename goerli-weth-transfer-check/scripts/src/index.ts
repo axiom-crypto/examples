@@ -44,7 +44,7 @@ async function main() {
     receiptSubqueries: [
       {
         txHash,
-        fieldOrLogIdx: receiptUseLogIdx(1),
+        fieldOrLogIdx: receiptUseLogIdx(1), // log index of `Transfer` event within that tx
         topicOrDataIdx: 1,
         eventSchema: eventSchema,
       }
