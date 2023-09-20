@@ -47,7 +47,7 @@ async function main() {
         txHash,
         fieldOrLogIdx: receiptUseLogIdx(2), // log index of `Transfer` event within that tx; NOT in the block
         topicOrDataIdx: 1,
-        eventSchema: eventSchema, // // keccak256("Transfer(address,address,uint256)")
+        eventSchema: eventSchema, // keccak256("Transfer(address,address,uint256)")
       },
     ],
   };
