@@ -10,6 +10,7 @@ import {
   buildHeaderSubquery,
   buildReceiptSubquery,
   buildTxSubquery,
+  bytes32,
   getFunctionSelector,
 } from '@axiom-crypto/experimental';
 import { ethers } from 'ethers';
@@ -21,7 +22,8 @@ import { findFirstUniswapTx } from './parseRecentTx';
 
 // Swap (address sender, address recipient, int256 amount0, int256 amount1, uint160 sqrtPriceX96, uint128 liquidity, int24 tick)
 const SWAP_EVENT_SCHEMA = "0xc42079f94a6350d7e6235f29174924f928cc2ac818eb64fed8004e115fbcca67";
-const AUTO_AIRDROP_ADDR = "0xf7d2A60cED0E9486fb4F718b89c6F6E99845de97";
+const AUTO_AIRDROP_ADDR = "0xD780ba6903FECebEdE0d7dFCc0a558227f9EAdc2";
+const BLOCK_NUMBER = 9000005;
 const UNI_V2_ROUTER_GOERLI = "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D";
 
 const privateKey = process.env.PRIVATE_KEY as string;
@@ -66,11 +68,16 @@ async function sendQuery(swapEvent: any) {
   console.log(receiptSubquery);
   query.appendDataSubquery(receiptSubquery);
 
+  // Junk test subquery to get a new queryHash
+  let headerSubquery = buildHeaderSubquery(BLOCK_NUMBER)
+    .field(HeaderField.Number);
+  query.appendDataSubquery(headerSubquery);
+
   const callback: AxiomV2Callback = {
-    callbackAddr: "0x2C10dD5b654dEbD31342bB3f3e151D08401c0382",
+    callbackAddr: AUTO_AIRDROP_ADDR,
     callbackFunctionSelector: getFunctionSelector("axiomV2Callback(uint64,address,bytes32,bytes32,bytes32[],bytes)"),
     resultLen: 3,
-    callbackExtraData: wallet.address,
+    callbackExtraData: bytes32(wallet.address),
   }
   query.setCallback(callback);
 
@@ -84,7 +91,7 @@ async function sendQuery(swapEvent: any) {
   // Calculate the payment
   const payment = await query.calculateFee();
 
-  console.log("dataQuery:", builtQuery.dataQueryEncoded);
+  console.log("dataQuery:", builtQuery.dataQuery);
   console.log("queryHash:", builtQuery.queryHash);
 
   // Submit Query to Airdrop contract
@@ -96,29 +103,19 @@ async function sendQuery(swapEvent: any) {
       callback: builtQuery.callback,
       maxFeePerGas: builtQuery.maxFeePerGas,
       callbackGasLimit: builtQuery.callbackGasLimit,
-      dataQuery: builtQuery.dataQueryEncoded,
+      dataQuery: builtQuery.dataQuery,
     }, 
     { value: payment }
   );
   const receipt = await tx.wait();
   console.log(receipt);
-
-  // Submit the Query
-  // await query.sendOnchainQuery(query.calculateFee(), (receipt) => {
-  //   console.log("receipt", receipt);
-  //   console.log("queryHash", query.getQueryHash());
-  // });
+  console.log("Query submitted.");
 }
 
 async function main() {
   // Get first Uniswap tx for address
   const swapEvent = await findFirstUniswapTx(wallet.address);
   await sendQuery(swapEvent);
-
-  // console.log(`Sending query 0 for block ${blockNumber}...`);
-  // await sendQuery(privateKey, blockNumber);
-  // console.log(`Sending query 1 for block ${blockNumber}...`);
-  // await sendQuery(privateKey1, blockNumber+1);
 }
 
 main();

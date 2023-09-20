@@ -6,8 +6,8 @@ settings:
 
 dependencies:
   '@axiom-crypto/experimental':
-    specifier: ^2.2.9
-    version: 2.2.9
+    specifier: ^2.2.10
+    version: 2.2.10
   dotenv:
     specifier: ^16.3.1
     version: 16.3.1
@@ -38,8 +38,8 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@axiom-crypto/experimental@2.2.9:
-    resolution: {integrity: sha512-4qAUQsXamZrM9yZJATHl2K/PdDEYco4w9+6o2t70i8maV7Z0GrltKcu6FJEZLWXdBXAjjDzabbzQSJfqOasMGQ==}
+  /@axiom-crypto/experimental@2.2.10:
+    resolution: {integrity: sha512-ia/WMLgQWHqm7A7Us52EuZMA1ivp6+mlwbqFHjNLyIb62h08uENTJDJUBD8cOcONFijTfQ8VZ0ghdnRK5rPkeg==}
     dependencies:
       '@axiom-crypto/codec': 0.3.6
       axios: 1.5.0

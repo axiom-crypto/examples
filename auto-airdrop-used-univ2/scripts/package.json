@@ -11,7 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@axiom-crypto/experimental": "^2.2.9",
+    "@axiom-crypto/experimental": "^2.2.10",
     "dotenv": "^16.3.1",
     "ethers": "^6.7.1"
   },
