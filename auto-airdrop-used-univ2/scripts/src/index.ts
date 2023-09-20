@@ -4,6 +4,7 @@ import {
   AxiomConfig,
   AxiomV2Callback,
   HeaderField,
+  HeaderSubquery,
   QueryV2,
   ReceiptField,
   buildAccountSubquery,
@@ -17,7 +18,7 @@ import { ethers } from 'ethers';
 import dotenv from 'dotenv';
 dotenv.config();
 
-import { abi as AutoAirdropAbi } from './abi/AutoAirdrop.json';
+import { abi as AutonomousAirdropAbi } from './abi/AutonomousAirdrop.json';
 import { findFirstUniswapTx } from './parseRecentTx';
 
 // Swap (address sender, address recipient, int256 amount0, int256 amount1, uint160 sqrtPriceX96, uint128 liquidity, int24 tick)
@@ -40,7 +41,11 @@ async function sendQuery(swapEvent: any) {
     throw new Error("Invalid Uniswap V2 `Swap` event");
   }
   
-  const autoAirdropContract = new ethers.Contract(AUTO_AIRDROP_ADDR, AutoAirdropAbi, wallet);
+  const autoAirdropContract = new ethers.Contract(
+    AUTO_AIRDROP_ADDR, 
+    AutonomousAirdropAbi, 
+    wallet
+  );
 
   const config: AxiomConfig = {
     providerUri: process.env.PROVIDER_URI_GOERLI as string,
@@ -68,8 +73,11 @@ async function sendQuery(swapEvent: any) {
   console.log(receiptSubquery);
   query.appendDataSubquery(receiptSubquery);
 
-  // Junk test subquery to get a new queryHash
-  let headerSubquery = buildHeaderSubquery(BLOCK_NUMBER)
+// Because each Query with the same subqueries can only be proven once, we are also 
+// adding this random data subquery to this public example to ensure that everyone 
+// who is using this Quickstart example can generate a proof
+  const randomGoerliBlock = Math.floor(Math.random() * 9700000);
+  const headerSubquery: HeaderSubquery = buildHeaderSubquery(randomGoerliBlock)
     .field(HeaderField.Number);
   query.appendDataSubquery(headerSubquery);
 

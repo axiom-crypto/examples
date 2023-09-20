@@ -20,8 +20,12 @@ contract AutonomousAirdrop is AxiomV2Client, Ownable {
     event ClaimAirdrop(
         address indexed user,
         bytes32 indexed queryHash,
-        bytes32[] axiomResults,
-        bytes callbackExtraData
+        uint256 numTokens,
+        bytes32[] axiomResults
+    );
+    event ClaimAirdropError(
+        address indexed user,
+        string error
     );
     event AxiomCallbackQuerySchemaUpdated(bytes32 axiomCallbackQuerySchema);
     event AxiomCallbackCallerAddrUpdated(address axiomCallbackCallerAddr);
@@ -81,11 +85,12 @@ contract AutonomousAirdrop is AxiomV2Client, Ownable {
     }
 
     function _validateDataQuery(bytes calldata dataQuery) internal pure {
+        // Get the TX hashes of each Receipt Subquery from the encdoed DataQuery
         bytes32 txHash0 = bytes32(dataQuery[12:44]);
         bytes32 txHash1 = bytes32(dataQuery[86:118]);
         bytes32 txHash2 = bytes32(dataQuery[160:192]);
-        require(keccak256(abi.encode(txHash0)) == keccak256(abi.encode(txHash1)), "txHashes for dataQuery do not match");
-        require(keccak256(abi.encode(txHash1)) == keccak256(abi.encode(txHash2)), "txHashes for dataQuery do not match");
+        require(keccak256(abi.encode(txHash0)) == keccak256(abi.encode(txHash1)), "txHashes[0,1] for dataQuery do not match");
+        require(keccak256(abi.encode(txHash1)) == keccak256(abi.encode(txHash2)), "txHashes[1,2] for dataQuery do not match");
     }
 
     function _validateAxiomV2Call(
@@ -124,27 +129,50 @@ contract AutonomousAirdrop is AxiomV2Client, Ownable {
         bytes32[] calldata axiomResults,
         bytes calldata callbackExtraData
     ) internal virtual override {
+        // Parse the submitted user address from the callbackExtraData
         address user = abi.decode(callbackExtraData, (address));
 
-        // // Parse results
+        // Parse results
         bytes32 eventSchema = axiomResults[0];
-        address userAddress = address(uint160(uint256(axiomResults[1])));
+        address userEventAddress = address(uint160(uint256(axiomResults[1])));
         uint32 blockNumber = uint32(uint256(axiomResults[2]));
 
-        // // Handle results
-        require(eventSchema == bytes32(0xC42079F94A6350D7E6235F29174924F928CC2AC818EB64FED8004E115FBCCA67), "Invalid event schema");
-        require(userAddress == user, "Invalid user address");
-        require(blockNumber > 9000000, "Block number for transaction receipt must be greater than 9000000");
+        // Handle results
+        if (eventSchema != bytes32(0xC42079F94A6350D7E6235F29174924F928CC2AC818EB64FED8004E115FBCCA67)) {
+            querySubmitted[user] = false;
+            emit ClaimAirdropError(
+                user,
+                "Invalid event schema"
+            );
+            return;
+        } 
+        if (userEventAddress != user) {
+            querySubmitted[user] = false;
+            emit ClaimAirdropError(
+                user,
+                "Invalid user address for event"
+            );
+            return;
+        }
+        if (blockNumber < 9000000) {
+            querySubmitted[user] = false;
+            emit ClaimAirdropError(
+                user,
+                "Block number for transaction receipt must be 9000000 or greater"
+            );
+            return;
+        }
 
         // Transfer tokens to user
         hasClaimed[user] = true;
-        token.transfer(user, 100 * 10**18);
+        uint256 numTokens = 100 * 10**18;
+        token.transfer(user, numTokens);
 
         emit ClaimAirdrop(
             user,
             queryHash,
-            axiomResults,
-            callbackExtraData
+            numTokens,
+            axiomResults
         );
     }
 }

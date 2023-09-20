@@ -8,7 +8,6 @@ export async function findFirstUniswapTx(address: string): Promise<any | null> {
     const recentTx = res?.data?.items ?? [];
     for (const tx of recentTx) {
       const to = tx?.to_address ?? "";
-      if (tx.block_height == 9610835 || tx.block_height == 9614158 || tx.block_height == 9614157 || tx.block_height == 9614156) continue; // DEBUG: remove this line
       if (to.toLowerCase() === Constants.UNISWAP_V2_GOERLI_ROUTER) {
         if (tx?.log_events?.length > 0) {
           for (const [idx, log] of tx.log_events.entries()) {
