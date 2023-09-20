@@ -65,9 +65,9 @@ contract AutonomousAirdrop is AxiomV2Client, Ownable {
     function claimAirdrop(
         AxiomV2QueryData calldata axiomData
     ) external payable {
-        // require(!hasClaimed[msg.sender], "User has already claimed this airdrop");
-        // require(!querySubmitted[msg.sender], "Query has already been submitted");
-        // querySubmitted[msg.sender] = true;
+        require(!hasClaimed[msg.sender], "User has already claimed this airdrop");
+        require(!querySubmitted[msg.sender], "Query has already been submitted");
+        querySubmitted[msg.sender] = true;
         _validateDataQuery(axiomData.dataQuery);
         bytes32 queryHash = IAxiomV2Query(axiomV2QueryAddress).sendQuery{ value: msg.value }(
             axiomData.sourceChainId,
@@ -98,6 +98,24 @@ contract AutonomousAirdrop is AxiomV2Client, Ownable {
         require(querySchema == axiomCallbackQuerySchema, "AxiomV2: query schema mismatch");
     }
 
+    function debugCallback(
+        uint64 sourceChainId,
+        address callerAddr,
+        bytes32 querySchema,
+        bytes32 queryHash,
+        bytes32[] calldata axiomResults,
+        bytes calldata callbackExtraData
+    ) external {
+        _axiomV2Callback(
+            sourceChainId,
+            callerAddr,
+            querySchema,
+            queryHash,
+            axiomResults,
+            callbackExtraData
+        );
+    }
+
     function _axiomV2Callback(
         uint64 sourceChainId,
         address callerAddr,
@@ -108,17 +126,19 @@ contract AutonomousAirdrop is AxiomV2Client, Ownable {
     ) internal virtual override {
         address user = abi.decode(callbackExtraData, (address));
 
+        // // Parse results
         bytes32 eventSchema = axiomResults[0];
         address userAddress = address(uint160(uint256(axiomResults[1])));
         uint32 blockNumber = uint32(uint256(axiomResults[2]));
 
-        require(eventSchema == bytes32(0x4627dbe6b61260f743b8c711823e81d7fcceda009cb16658e1cf79386a3e3228), "Invalid event schema");
+        // // Handle results
+        require(eventSchema == bytes32(0xC42079F94A6350D7E6235F29174924F928CC2AC818EB64FED8004E115FBCCA67), "Invalid event schema");
         require(userAddress == user, "Invalid user address");
         require(blockNumber > 9000000, "Block number for transaction receipt must be greater than 9000000");
 
         // Transfer tokens to user
         hasClaimed[user] = true;
-        token.transfer(user, 10 ** 18);
+        token.transfer(user, 100 * 10**18);
 
         emit ClaimAirdrop(
             user,
@@ -126,9 +146,5 @@ contract AutonomousAirdrop is AxiomV2Client, Ownable {
             axiomResults,
             callbackExtraData
         );
-        // // AxiomResults come in triplets of []
-        // for (uint256 i = 0; i < axiomResults.length; i++) {
-
-        // }
     }
 }
