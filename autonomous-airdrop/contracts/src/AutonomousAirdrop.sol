@@ -31,6 +31,8 @@ contract AutonomousAirdrop is AxiomV2Client, Ownable {
     event AxiomCallbackCallerAddrUpdated(address axiomCallbackCallerAddr);
     event AirdropTokenAddressUpdated(address token);
 
+    bytes32 public constant SWAP_EVENT_SCHEMA = 0xC42079F94A6350D7E6235F29174924F928CC2AC818EB64FED8004E115FBCCA67;
+
     uint64 public callbackSourceChainId;
     address public axiomCallbackCallerAddr;
     bytes32 public axiomCallbackQuerySchema;
@@ -71,6 +73,10 @@ contract AutonomousAirdrop is AxiomV2Client, Ownable {
     ) external payable {
         require(!hasClaimed[msg.sender], "User has already claimed this airdrop");
         require(!querySubmitted[msg.sender], "Query has already been submitted");
+
+        address user = abi.decode(axiomData.callback.callbackExtraData, (address));
+        require(user == msg.sender, "Address sent in callbackExtraData must be the same as the caller");
+
         querySubmitted[msg.sender] = true;
         _validateDataQuery(axiomData.dataQuery);
         bytes32 queryHash = IAxiomV2Query(axiomV2QueryAddress).sendQuery{ value: msg.value }(
@@ -101,7 +107,7 @@ contract AutonomousAirdrop is AxiomV2Client, Ownable {
         uint32 blockNumber = uint32(uint256(axiomResults[2]));
 
         // Handle results
-        if (eventSchema != bytes32(0xC42079F94A6350D7E6235F29174924F928CC2AC818EB64FED8004E115FBCCA67)) {
+        if (eventSchema != SWAP_EVENT_SCHEMA) {
             querySubmitted[user] = false;
             emit ClaimAirdropError(
                 user,

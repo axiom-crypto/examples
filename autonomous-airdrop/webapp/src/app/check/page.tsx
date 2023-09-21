@@ -46,7 +46,7 @@ export default async function Check({ searchParams }: PageProps) {
     return (
       <>
         <div className="text-center">
-          {"Congratluations! You're eligible for the UselessToken airdrop."}
+          {"Congratulations! You're eligible for the UselessToken airdrop."}
         </div>
         <LinkButton
           label="Build Axiom proof params"
