@@ -15,7 +15,7 @@ export default function Navbar() {
           Autonomous Airdrop Example
         </div>
       </Link>
-      <div className="flex flex-row items-center gap-8">
+      <div className="flex flex-row items-center gap-4 sm:gap-8">
         <Link href="https://axiom.xyz">
           Axiom
         </Link>
