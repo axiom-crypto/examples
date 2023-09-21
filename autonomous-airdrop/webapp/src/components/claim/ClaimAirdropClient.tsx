@@ -2,7 +2,7 @@
 
 import { Constants } from "@/shared/constants";
 import { BuiltQueryV2 } from "@axiom-crypto/experimental";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useAccount, useContractEvent, useContractRead, useContractWrite, usePrepareContractWrite } from "wagmi";
 import Button from "../ui/Button";
 import { useRouter } from "next/navigation";
@@ -18,6 +18,7 @@ export default function ClaimAirdropClient(
 ) {
   const { address } = useAccount();
   const router = useRouter();
+  const [showExplorerLink, setShowExplorerLink] = useState(false);
 
   const claimParams = [
     builtQuery.sourceChainId,
@@ -39,15 +40,22 @@ export default function ClaimAirdropClient(
   });
   const { data, isLoading, isSuccess, write } = useContractWrite(config);
 
-  // Check that the AxiomV1Query `queries` mapping doesn't already contain this `keccakQueryResponse`
-  // const { data: queryExists, isLoading: queryExistsLoading } = useContractRead({
-  //   address: Constants.AUTO_AIRDROP_ADDR as `0x${string}`,
-  //   abi: abi,
-  //   functionName: 'hasClaimed',
-  //   args: [address],
-  // });
+  // Check that the user has not claimed the airdrop yet
+  const { data: hasClaimed, isLoading: hasClaimedLoading } = useContractRead({
+    address: Constants.AUTO_AIRDROP_ADDR as `0x${string}`,
+    abi: abi,
+    functionName: 'hasClaimed',
+    args: [address],
+  });
+  console.log("hasClaimed?", hasClaimed);
 
-  // Monitor contract for `ClaimAirdrop` or `ClaimAirdropError`
+  useEffect(() => {
+    if (isSuccess) {
+      setTimeout(() => {
+        setShowExplorerLink(true);
+      }, 15000); 
+    }
+  }, [isSuccess, setShowExplorerLink]);
 
   const proofGeneratedAction = useCallback(() => {
     router.push(`success/?address=${address}`);
@@ -57,7 +65,7 @@ export default function ClaimAirdropClient(
     router.push(`fail/?address=${address}`);
   }, [router, address]);
   
-  // Add listener for QueryFulfilled event
+  // Monitor contract for `ClaimAirdrop` or `ClaimAirdropError` events
   useContractEvent({
     address: Constants.AUTO_AIRDROP_ADDR as `0x${string}`,
     abi: abi,
@@ -69,7 +77,6 @@ export default function ClaimAirdropClient(
     },
   });
 
-  // Add listener for QueryFulfilled event
   useContractEvent({
     address: Constants.AUTO_AIRDROP_ADDR as `0x${string}`,
     abi: abi,
@@ -88,6 +95,9 @@ export default function ClaimAirdropClient(
     if (isLoading) {
       return "Confrm transaction in wallet...";
     }
+    if (!!hasClaimed) {
+      return "Airdrop already claimed"
+    }
     return "Claim 100 UT";
   }
 
@@ -96,7 +106,7 @@ export default function ClaimAirdropClient(
   }
 
   const renderExplorerLink = () => {
-    if (!isSuccess) {
+    if (!showExplorerLink) {
       return null;
     }
     return (
@@ -109,7 +119,7 @@ export default function ClaimAirdropClient(
   return (
     <div className="flex flex-col items-center gap-2">
       <Button
-        disabled={isLoading || isSuccess}
+        disabled={isLoading || isSuccess || !!hasClaimed}
         onClick={() => write?.()}
       >
         { renderButtonText() }

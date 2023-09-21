@@ -2,6 +2,7 @@ import MainLayout from '@/components/layout/MainLayout'
 import ConnectWallet from '@/components/ui/ConnectWallet'
 import LinkButton from '@/components/ui/LinkButton'
 import Title from '@/components/ui/Title'
+import { forwardSearchParams } from '@/lib/utils'
 import Image from 'next/image'
 import Link from 'next/link'
 
@@ -21,12 +22,13 @@ interface SearchParams {
 
 export default async function Home({ searchParams }: PageProps) {
   const address = searchParams?.address as string ?? "";
+  console.log(searchParams);
 
   const renderButton = () => {
     if (address) {
       return <LinkButton
         label="Check Eligibility"
-        href="/check"
+        href={"/check?" + forwardSearchParams(searchParams)}
       />;
     }
     return <ConnectWallet addressVerify={address} />;

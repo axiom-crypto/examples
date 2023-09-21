@@ -1,5 +1,5 @@
 import { goerli } from "viem/chains";
-import { createConfig, configureChains } from "wagmi"
+import { createConfig, configureChains } from "wagmi";
 import { publicProvider } from "wagmi/providers/public";
 
 const { chains: _chains, publicClient, webSocketPublicClient } = configureChains(

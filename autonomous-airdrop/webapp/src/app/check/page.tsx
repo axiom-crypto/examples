@@ -1,6 +1,9 @@
 import LinkButton from "@/components/ui/LinkButton";
 import Title from "@/components/ui/Title";
 import { findFirstUniswapTx } from "@/lib/parseRecentTx";
+import { Constants } from "@/shared/constants";
+import { readContract } from "@wagmi/core";
+import autoAirdropJson from '@/lib/abi/AutonomousAirdrop.json';
 
 interface PageProps {
   params: Params;
@@ -17,6 +20,8 @@ interface SearchParams {
 
 export default async function Check({ searchParams }: PageProps) {
   const address = searchParams?.address as string ?? "";
+  
+  // Find the user's uniswap transaction with the `Swap` event
   const uniswapTx = await findFirstUniswapTx(address);
 
   const renderNotEligible = () => {

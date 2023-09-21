@@ -6,8 +6,11 @@ import {
   HeaderField,
   HeaderSubquery,
   QueryV2,
+  TxField,
+  TxType,
   buildHeaderSubquery,
   buildReceiptSubquery,
+  buildTxSubquery,
   bytes32,
   getFunctionSelector,
 } from '@axiom-crypto/experimental';
@@ -30,19 +33,33 @@ export const buildAxiomQuery = async (
   const axiom = new Axiom(config);
   const query = (axiom.query as QueryV2).new();
 
+  // Append a Receipt Subquery that gets the following event schema:
+  // Swap(address,uint256,uint256,uint256,uint256,address)
+  // 0xc42079f94a6350d7e6235f29174924f928cc2ac818eb64fed8004e115fbcca67
   let receiptSubquery = buildReceiptSubquery(txHash)
     .log(logIdx)
     .topic(0) // topic 0: event schema
     .eventSchema(Constants.EVENT_SCHEMA);
   query.appendDataSubquery(receiptSubquery);
+
+  // Append a Receipt Subquery that checks the address recipient field
   receiptSubquery = buildReceiptSubquery(txHash)
     .log(logIdx)
     .topic(2) // topic 2: recipient
     .eventSchema(Constants.EVENT_SCHEMA);
   query.appendDataSubquery(receiptSubquery);
+
+  // Append a Receipt Subquery that gets the block number of the transaction receipt
   receiptSubquery = buildReceiptSubquery(txHash)
     .blockNumber(); // block number of the transaction
   query.appendDataSubquery(receiptSubquery);
+
+  // Append a Transaction Subquery that gets the `to` field of the transaction
+  let txSubquery = buildTxSubquery(txHash)
+    .field(TxField.To)
+    .type(TxType.Eip1559);
+  console.log(txSubquery);
+  query.appendDataSubquery(txSubquery);
 
 // Because each Query with the same subqueries can only be proven once, we are also 
 // adding this random data subquery to this public example to ensure that everyone 
@@ -55,7 +72,6 @@ export const buildAxiomQuery = async (
   const callback: AxiomV2Callback = {
     callbackAddr: Constants.AUTO_AIRDROP_ADDR,
     callbackFunctionSelector: getFunctionSelector("axiomV2Callback(uint64,address,bytes32,bytes32,bytes32[],bytes)"),
-    resultLen: 3,
     callbackExtraData: bytes32(address),
   }
   query.setCallback(callback);
