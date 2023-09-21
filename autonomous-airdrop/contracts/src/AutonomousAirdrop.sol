@@ -77,8 +77,9 @@ contract AutonomousAirdrop is AxiomV2Client, Ownable {
         address user = abi.decode(axiomData.callback.callbackExtraData, (address));
         require(user == msg.sender, "Address sent in callbackExtraData must be the same as the caller");
 
-        querySubmitted[msg.sender] = true;
         _validateDataQuery(axiomData.dataQuery);
+        
+        querySubmitted[msg.sender] = true;
         bytes32 queryHash = IAxiomV2Query(axiomV2QueryAddress).sendQuery{ value: msg.value }(
             axiomData.sourceChainId,
             axiomData.dataQueryHash,
