@@ -4,3 +4,6 @@
 [submodule "autonomous-airdrop/contracts/lib/openzeppelin-contracts"]
 	path = autonomous-airdrop/contracts/lib/openzeppelin-contracts
 	url = https://github.com/openzeppelin/openzeppelin-contracts
+[submodule "autonomous-airdrop-example"]
+	path = autonomous-airdrop-example
+	url = https://github.com/axiom-crypto/autonomous-airdrop-example
