@@ -1,7 +1,7 @@
 {
-  "name": "circuit-runner-example",
+  "name": "node-example",
   "version": "0.1.0",
-  "description": "Example of a circuit runner in a node script",
+  "description": "Example of a custom compute circuit in a node script",
   "main": "index.js",
   "scripts": {
     "start": "ts-node src/index.ts"
