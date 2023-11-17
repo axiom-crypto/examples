@@ -1,4 +1,5 @@
 import dotenv from "dotenv";
+import axios from "axios";
 dotenv.config();
 import { MyAxiomCircuit } from "./circuit";
 import { MyInputs, myCircuitFn } from "./circuit/circuit";
@@ -105,7 +106,49 @@ const axiomMain = async () => {
   );
   console.log("Query built with the following params:", builtQuery);
 
-  console.log(
+  const dummyCaller = ethers.toBeHex(1, 20);
+  const queryId = await query.getQueryId(dummyCaller);
+  // console.log(
+  //   "About to send query to proof API. Watch the status of your query on Axiom Explorer:",
+  //   `https://explorer.axiom.xyz/v2/goerli/mock/query/${queryId}`,
+  // );
+
+  let data;
+  try {
+    const res = await axios.post("http://3.228.218.105:8005/v2/query_proofs", {
+      packedDataQuery: builtQuery.dataQuery,
+      dataQueryHash: builtQuery.dataQueryHash,
+      computeQuery: builtQuery.computeQuery,
+      callback: builtQuery.callback,
+      sourceChainId: builtQuery.sourceChainId,
+      userSalt: builtQuery.userSalt,
+      maxFeePerGas: builtQuery.maxFeePerGas,
+      callbackGasLimit: builtQuery.callbackGasLimit,
+      caller: dummyCaller,
+      refundee: dummyCaller,
+      queryId: queryId,
+      mock: true,
+    });
+    data = res.data;
+  } catch (e) {
+    const error = e as any;
+    if (error.response) {
+      // The request was made and the server responded with a status code that falls out of the range of 2xx
+      console.error(error.response.data);
+    } else if (error.request) {
+      // The request was made but no response was received
+      console.error(error.request);
+    } else {
+      // Something happened in setting up the request that triggered an Error
+      console.error("Error", error.message);
+    }
+    throw new Error("Failed to generate proof");
+  }
+
+  console.log("Proof generated: ");
+  console.log(data);
+
+  /*console.log(
     "Sending a Query to AxiomV2QueryMock with payment amount (wei):",
     payment,
   );
@@ -117,10 +160,7 @@ const axiomMain = async () => {
       console.log("receipt", receipt);
     },
   );
-  console.log(
-    "View your Query on Axiom Explorer:",
-    `https://explorer.axiom.xyz/v2/goerli/mock/query/${queryId}`,
-  );
+  */
 };
 
 axiomMain();
