@@ -4,7 +4,7 @@ This is an example of how to write a custom compute circuit and generate proofs 
 
 The `node` directory contains the custom compute circuit in [`circuit.ts`](./node/src/circuit/circuit.ts). There is a `MyCircuit` class in [`circuit/index.ts`](./node/src/circuit/index.ts) that provides helper functions for building the circuit from the circuit code and creating proofs for variable inputs. The [`index.ts`](./node/src/index.ts) has the `axiomMain()` function that first builds the circuit (creates proving key and verifying key) and then creates a proof for a given test input. The script then bundles the proof with the associated Data Query and sends the query on-chain (if you provide a `PRIVATE_KEY_GOERLI` environmental variable).
 
-For instructions on running the Node script, see the [README](./node/README.md) in the `node` directory.
+For instructions on running the Node script, see the [README](./node/readme.md) in the `node` directory.
 
 The node script sends a query with a callback to an example contract deployed on Goerli. The contract is in the `contracts` directory in [`ExampleMappingOffset.sol`](./contract/src/ExampleMappingOffset.sol).
 
