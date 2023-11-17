@@ -10,6 +10,3 @@
 [submodule "governance-params-example"]
 	path = governance-params-example
 	url = git@github.com:axiom-crypto/governance-params-example.git
-[submodule "circuit-runner-example/contract/lib/forge-std"]
-	path = circuit-runner-example/contract/lib/forge-std
-	url = https://github.com/foundry-rs/forge-std
