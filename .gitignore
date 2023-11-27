@@ -28,3 +28,9 @@ test/unit/debug
 
 # typescript
 *.tsbuildinfo
+
+.env
+*.pyc
+
+**/cache/
+**/out/
