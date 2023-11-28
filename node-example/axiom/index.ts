@@ -2,13 +2,7 @@ import dotenv from "dotenv";
 dotenv.config();
 import { MyCircuitInputs, myCircuitCode } from "./circuit";
 import { ethers, keccak256 } from "ethers";
-import {
-  Axiom,
-  BuiltQueryV2,
-  QueryBuilderV2,
-  bytes32,
-} from "@axiom-crypto/core";
-import { AxiomCircuit } from "@axiom-crypto/client-rc/js";
+import { AxiomCircuit } from "@axiom-crypto/client/js";
 import { HexString } from "ethers/lib.commonjs/utils/data";
 
 /// **Assuming** that your `key` is of uint type so it is left padded to 32 bytes.
@@ -40,9 +34,9 @@ async function generateQueryWithExtraData(
   const callback = {
     target: callbackAddr,
     extraData: ethers.concat([
-      bytes32(mappingSlot),
-      bytes32(key),
-      bytes32(offset),
+      ethers.zeroPadValue(mappingSlot, 32),
+      ethers.zeroPadValue(key, 32),
+      ethers.toBeHex(offset, 32),
     ]),
   };
   const input = {

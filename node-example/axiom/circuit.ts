@@ -3,7 +3,7 @@ import {
   getStorage,
   CircuitValue,
   CircuitValue256,
-} from "@axiom-crypto/client-rc";
+} from "@axiom-crypto/client";
 
 /// These should be the _variable_ inputs to your circuit. Constants can be hard-coded into the circuit itself (see below).
 export interface MyCircuitInputs {

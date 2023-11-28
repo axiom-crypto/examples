@@ -1,7 +1,7 @@
 {
   "name": "node-example",
-  "version": "0.1.0",
-  "description": "Example of a custom compute circuit in a node script",
+  "version": "0.2.0",
+  "description": "Example of using the Axiom Client SDK in a node script",
   "main": "index.js",
   "scripts": {
     "start": "ts-node axiom/index.ts"
@@ -10,9 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@axiom-crypto/client-rc": "^1.0.15",
-    "@axiom-crypto/core": "^2.2.50",
-    "axios": "^1.6.2",
+    "@axiom-crypto/client": "^0.1.0",
     "dotenv": "^16.3.1",
     "ethers": "^6.9.0"
   },
