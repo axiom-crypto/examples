@@ -1,12 +1,14 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import { AxiomV2Client } from "./AxiomV2Client.sol";
+import {AxiomV2Client} from "axiom-v2-contracts/contracts/client/AxiomV2Client.sol";
 
 /// @title  Example AxiomV2Client Contract
 /// @notice Example AxiomV2Client contract which emits events upon callback.
 contract ExampleMappingOffset is AxiomV2Client {
+    bytes32 constant QUERY_SCHEMA = 0xecb2734043cfa7957a288776a58fbd895ee5a5d390f036f3c1f96d416d1d57f7;
     /// @dev Error returned if the `sourceChainId` does not match.
+
     error SourceChainIdDoesNotMatch();
 
     /// @notice Emitted after validation of a callback.
@@ -15,10 +17,12 @@ contract ExampleMappingOffset is AxiomV2Client {
     event ExampleClientAddrAndSchema(address indexed caller, bytes32 indexed querySchema);
 
     /// @notice Emitted after callback is made.
-    event GotMappingValueWithOffset(uint256 indexed queryId, bytes32 mappingSlot, bytes32 key, uint256 offset, bytes32 value);
+    event GotMappingValueWithOffset(
+        uint256 indexed queryId, bytes32 mappingSlot, bytes32 key, uint256 offset, bytes32 value
+    );
 
     /// @dev The chain ID of the chain whose data the callback is expected to be called from.
-    uint64 public callbackSourceChainId;
+    uint64 immutable callbackSourceChainId;
 
     /// @notice Construct a new ExampleV2Client contract.
     /// @param  _axiomV2QueryAddress The address of the AxiomV2Query contract.
@@ -39,7 +43,7 @@ contract ExampleMappingOffset is AxiomV2Client {
         if (sourceChainId != callbackSourceChainId) {
             revert SourceChainIdDoesNotMatch();
         }
-        require(querySchema == 0x5ccccce92bd3d53df098f4f4a8eb5e85eac898db787c6eaadc2937bf843a9c87, "Invalid query schema");
+        require(querySchema == QUERY_SCHEMA, "Invalid query schema");
 
         emit ExampleClientAddrAndSchema(caller, querySchema);
     }
