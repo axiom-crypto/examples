@@ -7,9 +7,6 @@
 [submodule "autonomous-airdrop-example"]
 	path = autonomous-airdrop-example
 	url = https://github.com/axiom-crypto/autonomous-airdrop-example
-[submodule "governance-params-example"]
-	path = governance-params-example
-	url = git@github.com:axiom-crypto/governance-params-example.git
 [submodule "node-example/lib/forge-std"]
 	path = node-example/lib/forge-std
 	url = https://github.com/foundry-rs/forge-std
