@@ -9,7 +9,7 @@ import { HexString } from "ethers/lib.commonjs/utils/data";
 function getRawSlotForMapping(
   mappingSlot: HexString,
   key: HexString,
-  offset: number
+  offset: number,
 ): HexString {
   // See https://docs.soliditylang.org/en/v0.8.23/internals/layout_in_storage.html#mappings-and-dynamic-arrays
   const p = ethers.zeroPadValue(mappingSlot, 32);
@@ -26,7 +26,7 @@ async function generateQueryWithExtraData(
   key: HexString,
   offset: number,
   callbackAddr: string,
-  senderAddr: string
+  senderAddr: string,
 ) {
   // This is a calculation purely in Typescript. It cannot be trusted since it's outside the circuit!
   const offsetSlot = getRawSlotForMapping(mappingSlot, key, offset);
@@ -80,15 +80,17 @@ const axiomMain = async () => {
     // To find the slot of a mapping, use the following command:
     // $ forge inspect <contract> storage-layout --pretty
     mappingSlot: ethers.toBeHex(300), // slot 300 of AxiomV2Query is `mapping(uint256 => AxiomQueryMetadata) public queries`
-    queryId: 66966676587627506390515603527468953886054461497745819784183473907733311885447n,
+    queryId:
+      66966676587627506390515603527468953886054461497745819784183473907733311885447n,
     offset: 1, // offset 1 should be the `payment` field in `AxiomQueryMetadata`
   };
 
-  const provider = new ethers.JsonRpcProvider(process.env
-    .PROVIDER_URI_GOERLI as string);
+  const provider = new ethers.JsonRpcProvider(
+    process.env.PROVIDER_URI_GOERLI as string,
+  );
   const signer = new ethers.Wallet(
     process.env.PRIVATE_KEY_GOERLI as string,
-    provider
+    provider,
   );
   const deployedCallbackAddr = "0x973aBC20172BA768B2285DA76CCc18741f7fBA0D";
   const {
@@ -104,27 +106,28 @@ const axiomMain = async () => {
     ethers.toBeHex(test.queryId, 32),
     test.offset,
     deployedCallbackAddr,
-    signer.address
+    signer.address,
   );
   console.log("Query built with the following args:", args);
 
   const axiomV2QueryMock = new ethers.Contract(
     axiomV2QueryMockAddr,
     abi,
-    signer
+    signer,
   );
 
   console.log(
     "Sending a Query to AxiomV2QueryMock with payment amount (wei):",
-    value
+    value,
   );
+  // Comment this out if you do not want to broadcast the transaction:
   const tx = await axiomV2QueryMock.sendQuery(...args, { value });
   const receipt: ethers.ContractTransactionReceipt = await tx.wait();
   console.log("Transaction receipt:", receipt);
 
   console.log(
     "View your Query on Axiom Explorer:",
-    `https://explorer.axiom.xyz/v2/goerli/mock/query/${queryId}`
+    `https://explorer.axiom.xyz/v2/goerli/mock/query/${queryId}`,
   );
 };
 

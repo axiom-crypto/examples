@@ -16,5 +16,6 @@ Steps:
 
 1. Run `pnpm install`
 2. Edit the `test` input in `axiomMain()` of `axiom/index.ts`.
-3. Run `pnpm start` to run the client circuit written in `axiom/circuit.ts` based on the test input and send the associated `AxiomV2Query` on-chain.
-4. Values shown in console.
+3. Copy `.env.example` to `.env` and fill in the fields with your JSON-RPC provider URL and Goerli private key. You can edit `axiom/index.ts` to remove the `sendQuery` call if you don't want to send the query on-chain.
+4. Run `pnpm start` to run the client circuit written in `axiom/circuit.ts` based on the test input and send the associated `AxiomV2Query` on-chain.
+5. Values shown in console.
