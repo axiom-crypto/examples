@@ -57,6 +57,10 @@ const axiomMain = async () => {
   const circuit = new AxiomCircuit({
     provider: process.env.PROVIDER_URI_GOERLI as string,
     f: myCircuitCode,
+    inputSchema: `{
+      "blockNumber": "CircuitValue",
+      "rawSlot": "CircuitValue256"
+    }`,
     chainId: 5,
     mock: true,
   });
