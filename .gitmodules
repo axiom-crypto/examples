@@ -13,3 +13,6 @@
 [submodule "node-example/lib/axiom-v2-contracts"]
 	path = node-example/lib/axiom-v2-contracts
 	url = https://github.com/axiom-crypto/axiom-v2-contracts
+[submodule "governance-params-example"]
+	path = governance-params-example
+	url = git@github.com:axiom-crypto/governance-params-example.git
