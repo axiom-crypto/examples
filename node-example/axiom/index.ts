@@ -69,7 +69,7 @@ const axiomMain = async () => {
     rawSlot: ethers.ZeroHash,
   };
   const artifact = await circuit.compile(defaultInputs);
-  console.log(artifact);
+
   // Instead of compiling, you can load from a saved artifact:
   await circuit.loadSaved({ config: artifact.config, vk: artifact.vk });
 
