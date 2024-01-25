@@ -7,3 +7,6 @@
 [submodule "autonomous-airdrop-example"]
 	path = autonomous-airdrop-example
 	url = git@github.com:axiom-crypto/autonomous-airdrop-example.git
+[submodule "governance-params-example"]
+	path = governance-params-example
+	url = https://github.com/axiom-crypto/governance-params-example.git
