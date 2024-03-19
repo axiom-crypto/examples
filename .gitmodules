@@ -10,3 +10,6 @@
 [submodule "governance-params-example"]
 	path = governance-params-example
 	url = https://github.com/axiom-crypto/governance-params-example.git
+[submodule "unsupported-asset-refund"]
+	path = unsupported-asset-refund
+	url = https://github.com/axiom-crypto/unsupported-asset-refund
